@@ -1,0 +1,30 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Verifica H1
+      id: verifica-h1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Verifica H1
+        setup-command: npm install cheerio
+        command: node .github/tests/verify_h1.js
+        timeout: 10
+        max-score: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        VERIFICA-H1_RESULTS: "${{steps.verifica-h1.outputs.result}}"
+      with:
+        runners: verifica-h1
